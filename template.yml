@@ -1,0 +1,25 @@
+ROSTemplateFormatVersion: '2015-09-01'
+Transform: 'Aliyun::Serverless-2018-04-03'
+Resources:
+  fcGraphql: # service name
+    Type: 'Aliyun::Serverless::Service'
+    Properties:
+      Description: 'fc for auto testing'
+    myFunction: # function name
+      Type: 'Aliyun::Serverless::Function'
+      Properties:
+        Handler: index.handler
+        Runtime: nodejs8
+        CodeUri: './'
+        Timeout: 60
+
+  MyFunctionGroup: # group name
+    Type: 'Aliyun::Serverless::Api'
+    Properties:
+      StageName: RELEASE
+      DefinitionBody:
+        '/':
+          post:
+            x-aliyun-apigateway-api-name: fc_graphql
+            x-aliyun-apigateway-fc:
+              arn: acs:fc:::services/${fcGraphql.Arn}/functions/${myFunction.Arn}/
